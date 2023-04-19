@@ -49,5 +49,5 @@ app.*.map.json
 /ios/build
 
 # KeyStore
-*.jks
-/android/key.properties
+# *.jks
+# /android/key.properties

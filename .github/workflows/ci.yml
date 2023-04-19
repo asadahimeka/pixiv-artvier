@@ -1,0 +1,46 @@
+name: Flutter CI
+on:
+  push:
+    branches:
+    - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '12.x'
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        architecture: x64
+    # - run: flutter doctor -v
+    # Get flutter dependencies.
+    - run: flutter pub get
+    # - name: Configure Keystore
+    #   run: |
+    #     echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
+    #     echo "storeFile=upload-keystore.jks" >> key.properties
+    #     echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> key.properties
+    #     echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> key.properties
+    #     echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> key.properties
+    #   env:
+    #     PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+    #     KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+    #     KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+    #     KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+    #   working-directory: android
+    # Build apk.
+    # - run: flutter build apk --debug --no-shrink
+    - run: flutter build apk
+    - uses: actions/upload-artifact@v3
+      with:
+        name: pixiv-artvier
+        path: build/app/outputs/flutter-apk/*.apk
+    # Push APK to Releases
+    # - uses: ncipollo/release-action@v1
+    #   with:
+    #     artifacts: "build/app/outputs/flutter-apk/*.apk"
+    #     token: ${{secrets.GITHUB_TOKEN}}
+    # Upload generated apk to the artifacts.
