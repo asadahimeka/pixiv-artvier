@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:artvier/config/http_base_options.dart';
+import 'package:artvier/model_response/illusts/illust_detail.dart';
 import 'package:artvier/model_response/illusts/pixivision/spotlight_articles.dart';
 import 'package:dio/dio.dart';
 import 'package:artvier/config/enums.dart';
 import 'package:artvier/model_response/common/collection_detail.dart';
-import 'package:artvier/model_response/illusts/common_illust.dart';
 import 'package:artvier/model_response/illusts/common_illust_list.dart';
 import 'package:artvier/model_response/illusts/illust_comments.dart';
 import 'package:artvier/model_response/illusts/recommended/illust_recommended.dart';
@@ -14,16 +15,16 @@ class ApiIllusts extends ApiBase {
   ApiIllusts(super.requester);
 
   /// 获取插画详情
-  Future<CommonIllust> illustDetail(String illustId, {CancelToken? cancelToken}) async {
+  Future<IllustDetail> illustDetail(String illustId, {CancelToken? cancelToken}) async {
     Response res = await requester.get<String>(
-      " /v1/illust/detail",
+      "/v1/illust/detail",
       queryParameters: {
         "illust_id": illustId,
       },
       options: Options(responseType: ResponseType.json),
       cancelToken: cancelToken,
     );
-    return CommonIllust.fromJson(json.decode(res.data));
+    return IllustDetail.fromJson(json.decode(res.data));
   }
 
   /// 获取推荐插画
@@ -106,17 +107,6 @@ class ApiIllusts extends ApiBase {
     return SpotlightArticles.fromJson(json.decode(res.data));
   }
 
-  /// 获取下一页插画亮点 Pixivision
-  /// - [nextUrl] 下一页的链接地址
-  Future<SpotlightArticles> nextIllustPixivision(String nextUrl, {CancelToken? cancelToken}) async {
-    Response res = await requester.get<String>(
-      nextUrl,
-      options: Options(responseType: ResponseType.json),
-      cancelToken: cancelToken,
-    );
-    return SpotlightArticles.fromJson(json.decode(res.data));
-  }
-
   /// 高级收藏的时候，获取标签列表（含画作标签 + 用户收藏里已有的标签）
   Future<TheCollectionDetail> illustCollectionDetail(String illustId, {CancelToken? cancelToken}) async {
     Response res = await requester.get<String>(
@@ -190,5 +180,15 @@ class ApiIllusts extends ApiBase {
       cancelToken: cancelToken,
     );
     return IllustComments.fromJson(json.decode(res.data));
+  }
+
+  /// 获取 Pixivisiton 插画网页
+  Future<String> illustPixvisionWebContent(String language, int id, {CancelToken? cancelToken}) async {
+    Response res = await requester.get<String>(
+      "https://${HttpBaseOptions.pixivisionHost}/$language/a/$id",
+      options: Options(responseType: ResponseType.plain),
+      cancelToken: cancelToken,
+    );
+    return res.data;
   }
 }
